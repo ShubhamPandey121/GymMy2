@@ -2,7 +2,7 @@ import { Inter } from 'next/font/google';
 import { ClerkProvider } from '@clerk/nextjs';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import Navigation from '@/components/layout/Navigation';
+// import Navigation from '@/components/layout/Navigation';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -24,7 +24,7 @@ export default function RootLayout({
     <ClerkProvider
       appearance={{
         variables: {
-          colorPrimary: '#FF69B4',
+          colorPrimary: '#3B82F6', // Blue-500
           colorBackground: '#ffffff',
           colorInputBackground: '#f8fafc',
           colorInputText: '#1f2937',
@@ -34,10 +34,10 @@ export default function RootLayout({
           fontFamily: 'Inter, system-ui, sans-serif',
         },
         elements: {
-          formButtonPrimary: 'bg-gradient-to-r from-cute-pink to-cute-peach hover:scale-105 transition-all duration-300',
-          card: 'shadow-2xl',
+          formButtonPrimary: 'bg-gradient-to-r from-blue-500 to-purple-500 hover:scale-105 transition-all duration-300',
+          card: 'shadow-2xl border border-slate-200',
           headerTitle: 'font-cute',
-          footerActionLink: 'text-cute-pink hover:text-cute-sky',
+          footerActionLink: 'text-blue-600 hover:text-purple-600',
         },
       }}
     >
@@ -48,9 +48,9 @@ export default function RootLayout({
             rel="stylesheet"
           />
         </head>
-        <body className={`${inter.className} min-h-screen bg-gradient-to-br from-slate-50 to-slate-100`}>
+        <body className={`${inter.className} min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50`}>
           {/* Navigation Sidebar - Only for signed-in users on dashboard pages */}
-          <Navigation />
+          {/* <Navigation /> */}
           
           {/* Main Layout Structure */}
           <div className="min-h-screen flex flex-col">
@@ -60,11 +60,12 @@ export default function RootLayout({
             {/* Main Content */}
             <main className="flex-1 relative">
               {/* Background Elements - Only for non-landing pages */}
-              <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-10 right-10 w-32 h-32 bg-cute-pink rounded-full opacity-5 animate-pulse-slow"></div>
-                <div className="absolute bottom-20 left-10 w-24 h-24 bg-cute-lavender rounded-full opacity-10 animate-bounce-soft"></div>
-                <div className="absolute top-1/2 left-1/3 w-16 h-16 bg-cute-mint rounded-full opacity-5 animate-wiggle"></div>
-              </div>
+              {/* <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-10 right-10 w-32 h-32 bg-blue-200 rounded-full opacity-5 animate-pulse"></div>
+                <div className="absolute bottom-20 left-10 w-24 h-24 bg-indigo-200 rounded-full opacity-8 animate-bounce"></div>
+                <div className="absolute top-1/2 left-1/3 w-16 h-16 bg-purple-200 rounded-full opacity-5 animate-pulse"></div>
+                <div className="absolute top-1/4 right-1/4 w-20 h-20 bg-sky-200 rounded-full opacity-6 animate-bounce"></div>
+              </div> */}
              
               {/* Content */}
               <div className="relative z-10">
@@ -77,7 +78,7 @@ export default function RootLayout({
           </div>
          
           {/* Global Loading Overlay */}
-          <div id="loading-overlay" className="fixed inset-0 bg-gradient-to-br from-cute-pink via-cute-peach to-cute-lavender opacity-0 pointer-events-none transition-opacity duration-500 z-50 flex items-center justify-center">
+          <div id="loading-overlay" className="fixed inset-0 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 opacity-0 pointer-events-none transition-opacity duration-500 z-50 flex items-center justify-center">
             <div className="text-center">
               <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin mb-4 mx-auto"></div>
               <p className="text-white font-cute text-xl">Loading your fitness journey... 🚀</p>
