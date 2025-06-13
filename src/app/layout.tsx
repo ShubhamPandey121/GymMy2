@@ -2,7 +2,6 @@ import { Inter } from 'next/font/google';
 import { ClerkProvider } from '@clerk/nextjs';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-// import Navigation from '@/components/layout/Navigation';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -30,14 +29,16 @@ export default function RootLayout({
           colorInputText: '#1f2937',
           colorText: '#1f2937',
           colorTextSecondary: '#6b7280',
-          borderRadius: '0.75rem',
+          borderRadius: '1rem',
           fontFamily: 'Inter, system-ui, sans-serif',
         },
         elements: {
-          formButtonPrimary: 'bg-gradient-to-r from-blue-500 to-purple-500 hover:scale-105 transition-all duration-300',
-          card: 'shadow-2xl border border-slate-200',
-          headerTitle: 'font-cute',
-          footerActionLink: 'text-blue-600 hover:text-purple-600',
+          formButtonPrimary: 'bg-gradient-to-r from-blue-500 to-purple-500 hover:scale-105 transition-all duration-300 shadow-lg',
+          card: 'shadow-2xl border border-white/20 backdrop-blur-lg bg-white/90',
+          headerTitle: 'font-cute bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent',
+          footerActionLink: 'text-blue-600 hover:text-purple-600 transition-colors duration-300',
+          socialButtonsBlockButton: 'border-2 border-gray-200 hover:border-blue-300 transition-all duration-300',
+          dividerLine: 'bg-gradient-to-r from-transparent via-gray-300 to-transparent',
         },
       }}
     >
@@ -48,25 +49,32 @@ export default function RootLayout({
             rel="stylesheet"
           />
         </head>
-        <body className={`${inter.className} min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50`}>
-          {/* Navigation Sidebar - Only for signed-in users on dashboard pages */}
-          {/* <Navigation /> */}
-          
+        <body className={`${inter.className} min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 relative overflow-x-hidden`}>
+          {/* Animated Background Elements */}
+          <div className="fixed inset-0 pointer-events-none z-0 opacity-[0.03]">
+            <div className="absolute top-[10%] left-[5%] text-[120px] text-blue-500 animate-bounce" style={{ animationDelay: '0s', animationDuration: '6s' }}>🏋️</div>
+            <div className="absolute top-[60%] right-[8%] text-[120px] text-purple-500 animate-pulse" style={{ animationDelay: '2s', animationDuration: '6s' }}>💪</div>
+            <div className="absolute bottom-[20%] left-[15%] text-[120px] text-blue-500 animate-bounce" style={{ animationDelay: '4s', animationDuration: '6s' }}>🏃</div>
+            <div className="absolute top-[30%] right-[25%] text-[120px] text-indigo-500 animate-pulse" style={{ animationDelay: '1s', animationDuration: '6s' }}>🚴</div>
+            <div className="absolute bottom-[40%] right-[40%] text-[120px] text-sky-500 animate-bounce" style={{ animationDelay: '3s', animationDuration: '6s' }}>🎯</div>
+          </div>
+
+          {/* Floating Bubbles */}
+          <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+            <div className="absolute top-20 left-10 w-16 h-16 bg-blue-200 rounded-full opacity-20 animate-bounce" style={{ animationDelay: '0s', animationDuration: '4s' }}></div>
+            <div className="absolute top-40 right-20 w-12 h-12 bg-purple-200 rounded-full opacity-30 animate-pulse" style={{ animationDelay: '1s', animationDuration: '5s' }}></div>
+            <div className="absolute bottom-40 left-20 w-20 h-20 bg-indigo-200 rounded-full opacity-15 animate-bounce" style={{ animationDelay: '2s', animationDuration: '6s' }}></div>
+            <div className="absolute bottom-20 right-10 w-14 h-14 bg-sky-200 rounded-full opacity-25 animate-pulse" style={{ animationDelay: '3s', animationDuration: '4s' }}></div>
+            <div className="absolute top-1/2 left-1/3 w-18 h-18 bg-blue-300 rounded-full opacity-10 animate-bounce" style={{ animationDelay: '1.5s', animationDuration: '5s' }}></div>
+          </div>
+         
           {/* Main Layout Structure */}
-          <div className="min-h-screen flex flex-col">
+          <div className="min-h-screen flex flex-col relative z-10">
             {/* Header - Always visible */}
             <Header />
            
             {/* Main Content */}
             <main className="flex-1 relative">
-              {/* Background Elements - Only for non-landing pages */}
-              {/* <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-10 right-10 w-32 h-32 bg-blue-200 rounded-full opacity-5 animate-pulse"></div>
-                <div className="absolute bottom-20 left-10 w-24 h-24 bg-indigo-200 rounded-full opacity-8 animate-bounce"></div>
-                <div className="absolute top-1/2 left-1/3 w-16 h-16 bg-purple-200 rounded-full opacity-5 animate-pulse"></div>
-                <div className="absolute top-1/4 right-1/4 w-20 h-20 bg-sky-200 rounded-full opacity-6 animate-bounce"></div>
-              </div> */}
-             
               {/* Content */}
               <div className="relative z-10">
                 {children}
@@ -81,7 +89,9 @@ export default function RootLayout({
           <div id="loading-overlay" className="fixed inset-0 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 opacity-0 pointer-events-none transition-opacity duration-500 z-50 flex items-center justify-center">
             <div className="text-center">
               <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin mb-4 mx-auto"></div>
-              <p className="text-white font-cute text-xl">Loading your fitness journey... 🚀</p>
+              <p className="text-white font-semibold text-xl" style={{ fontFamily: 'Comic Neue, cursive' }}>
+                Loading your fitness journey... 🚀
+              </p>
             </div>
           </div>
         </body>
