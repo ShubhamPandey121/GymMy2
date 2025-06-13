@@ -1,20 +1,12 @@
 import React from 'react';
 
+import CuteRobotSVG from '@/components/icons/GymMyLogo.svg';
+
 export const CuteRobotIcon = ({ className = "w-8 h-8" }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 100 100" fill="none">
-    <circle cx="50" cy="40" r="25" fill="#ff6b9d" />
-    <circle cx="43" cy="35" r="3" fill="white" />
-    <circle cx="57" cy="35" r="3" fill="white" />
-    <path d="M45 45 Q50 50 55 45" stroke="white" strokeWidth="2" fill="none" />
-    <rect x="40" y="60" width="20" height="25" rx="5" fill="#ffb347" />
-    <rect x="35" y="45" width="8" height="15" rx="4" fill="#98fb98" />
-    <rect x="57" y="45" width="8" height="15" rx="4" fill="#98fb98" />
-    <circle cx="35" cy="20" r="3" fill="#dda0dd" />
-    <circle cx="65" cy="20" r="3" fill="#dda0dd" />
-    <line x1="38" y1="20" x2="42" y2="30" stroke="#dda0dd" strokeWidth="2" />
-    <line x1="62" y1="20" x2="58" y2="30" stroke="#dda0dd" strokeWidth="2" />
-  </svg>
+  <img src="/GymMyLogo.svg" className={className} alt="Cute Robot" />
 );
+
+
 
 export const FitnessCharacterIcon = ({ type, className = "w-12 h-12" }: { type: string, className?: string }) => {
   const getCharacter = () => {

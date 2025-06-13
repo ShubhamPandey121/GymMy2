@@ -27,7 +27,7 @@ export default function LandingPage() {
       </div>
 
       {/* Header */}
-      <header className="relative py-6 px-6">
+      {/* <header className="relative py-6 px-6">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <CuteRobotIcon className="w-12 h-12 animate-wiggle" />
@@ -40,7 +40,7 @@ export default function LandingPage() {
             Get Started
           </button>
         </div>
-      </header>
+      </header> */}
 
       {/* Main Content */}
       <main className="relative">
@@ -101,11 +101,11 @@ export default function LandingPage() {
       </main>
 
       {/* Footer */}
-      <footer className="relative py-8 text-center">
+      {/* <footer className="relative py-8 text-center">
         <p className="text-white opacity-60">
           Made with 💖 by Shubham
         </p>
-      </footer>
+      </footer> */}
     </div>
   );
 }
