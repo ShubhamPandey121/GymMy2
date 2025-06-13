@@ -68,7 +68,7 @@ export interface FitnessPlan {
 }
 
 export async function generateFitnessPlans(userData: UserData): Promise<FitnessPlan> {
-  const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
   const prompt = `
     Create a comprehensive ${userData.targetDays}-day fitness and diet plan for:
@@ -162,12 +162,12 @@ export async function generateFitnessPlans(userData: UserData): Promise<FitnessP
     console.log('Raw Gemini response:', result);
     
     const response = await result.response;
-    const text = response.text();
-    console.log('Response text:', text);
-    
-    // More robust JSON parsing
+    const text = await response.text();
+    // Remove Markdown code block if present
+    const cleanedText = text.replace(/^```[a-zA-Z]*\s*/, '').replace(/```\s*$/, '');
+    console.log('Response text:', cleanedText);
     try {
-      const jsonResponse = JSON.parse(text);
+      const jsonResponse = JSON.parse(cleanedText);
       return jsonResponse as FitnessPlan;
     } catch (parseError) {
       console.error('JSON parsing error:', parseError);

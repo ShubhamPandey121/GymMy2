@@ -90,7 +90,7 @@ export default function FitnessGoalsForm() {
         localStorage.setItem('userData', JSON.stringify(formData));
         
         // Navigate to results page
-        router.push('/fitness-plan');
+        router.push('/fitness');
         
       } catch (error) {
         console.error('Error generating fitness plans:', error);
