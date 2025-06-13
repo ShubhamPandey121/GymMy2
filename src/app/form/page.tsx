@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { generateFitnessPlans, UserData } from '@/lib/gemini';
 
 interface FormData {
   age: string;
@@ -20,6 +21,7 @@ interface FormErrors {
 
 export default function FitnessGoalsForm() {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     age: '',
     height: '',
@@ -74,48 +76,44 @@ export default function FitnessGoalsForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (validateForm()) {
-      console.log('Form submitted:', formData);
+      setIsLoading(true);
       
-      // TODO: Call Gemini AI for analysis and plan generation
-      // This is where you'll integrate with Gemini AI API
-      generateFitnessPlans(formData);
-      
-      // For now, just show success message
-      alert('Form submitted successfully! 🎉');
-    }
-  };
-
-  // Function to call Gemini AI for generating personalized plans
-  const generateFitnessPlans = async (userData: FormData) => {
-    try {
-      // TODO: Implement Gemini AI integration
-      // This function will:
-      // 1. Send user data to Gemini AI
-      // 2. Generate personalized diet plan based on user's goals and restrictions
-      // 3. Generate personalized workout/task plan based on fitness level and goals
-      // 4. Store the generated plans in your database
-      // 5. Navigate user to dashboard with their personalized plans
-      
-      console.log('Generating personalized plans for:', userData);
-      
-      // Example API call structure (implement this):
-      // const dietPlan = await generateDietPlan(userData);
-      // const workoutPlan = await generateWorkoutPlan(userData);
-      // 
-      // Navigate to dashboard after successful generation
-      // router.push('/dashboard');
-      
-    } catch (error) {
-      console.error('Error generating fitness plans:', error);
-      alert('Sorry, there was an error generating your plans. Please try again.');
+      try {
+        // Generate fitness plans using Gemini AI
+        const fitnessPlans = await generateFitnessPlans(formData as UserData);
+        
+        // Store the plans in localStorage for the results page
+        localStorage.setItem('fitnessPlans', JSON.stringify(fitnessPlans));
+        localStorage.setItem('userData', JSON.stringify(formData));
+        
+        // Navigate to results page
+        router.push('/fitness-plan');
+        
+      } catch (error) {
+        console.error('Error generating fitness plans:', error);
+        alert('Sorry, there was an error generating your plans. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-cute-pink via-cute-peach to-cute-lavender overflow-hidden">
+      {/* Loading Overlay */}
+      {isLoading && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+          <div className="bg-white rounded-3xl p-8 text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-cute-pink mx-auto mb-4"></div>
+            <h3 className="text-2xl font-bold text-cute-pink mb-2">Creating Your Plan ✨</h3>
+            <p className="text-gray-600">Our AI is crafting the perfect fitness plan just for you...</p>
+          </div>
+        </div>
+      )}
+
       {/* Floating Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-16 h-16 bg-cute-mint rounded-full opacity-20 animate-bounce-soft"></div>
@@ -155,6 +153,7 @@ export default function FitnessGoalsForm() {
                   placeholder="Enter your age"
                   min="13"
                   max="100"
+                  disabled={isLoading}
                 />
                 {errors.age && <p className="text-red-300 text-sm">{errors.age}</p>}
               </div>
@@ -173,6 +172,7 @@ export default function FitnessGoalsForm() {
                   placeholder="Enter height in cm"
                   min="100"
                   max="250"
+                  disabled={isLoading}
                 />
                 {errors.height && <p className="text-red-300 text-sm">{errors.height}</p>}
               </div>
@@ -191,6 +191,7 @@ export default function FitnessGoalsForm() {
                   placeholder="Enter weight in kg"
                   min="30"
                   max="300"
+                  disabled={isLoading}
                 />
                 {errors.weight && <p className="text-red-300 text-sm">{errors.weight}</p>}
               </div>
@@ -205,6 +206,7 @@ export default function FitnessGoalsForm() {
                   value={formData.fitnessGoal}
                   onChange={handleInputChange}
                   className="w-full p-4 rounded-2xl bg-white/20 backdrop-blur-sm border border-white/30 text-white focus:outline-none focus:ring-2 focus:ring-cute-sky focus:border-transparent transition-all duration-300"
+                  disabled={isLoading}
                 >
                   <option value="" className="text-gray-800">Select your goal</option>
                   <option value="weight-loss" className="text-gray-800">Weight Loss</option>
@@ -227,6 +229,7 @@ export default function FitnessGoalsForm() {
                   value={formData.targetDays}
                   onChange={handleInputChange}
                   className="w-full p-4 rounded-2xl bg-white/20 backdrop-blur-sm border border-white/30 text-white focus:outline-none focus:ring-2 focus:ring-cute-sky focus:border-transparent transition-all duration-300"
+                  disabled={isLoading}
                 >
                   <option value="" className="text-gray-800">Select timeframe</option>
                   <option value="5" className="text-gray-800">5 Days</option>
@@ -247,6 +250,7 @@ export default function FitnessGoalsForm() {
                   value={formData.currentFitnessLevel}
                   onChange={handleInputChange}
                   className="w-full p-4 rounded-2xl bg-white/20 backdrop-blur-sm border border-white/30 text-white focus:outline-none focus:ring-2 focus:ring-cute-sky focus:border-transparent transition-all duration-300"
+                  disabled={isLoading}
                 >
                   <option value="" className="text-gray-800">Select your level</option>
                   <option value="beginner" className="text-gray-800">Beginner</option>
@@ -270,6 +274,7 @@ export default function FitnessGoalsForm() {
                 rows={3}
                 className="w-full p-4 rounded-2xl bg-white/20 backdrop-blur-sm border border-white/30 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-cute-sky focus:border-transparent transition-all duration-300 resize-none"
                 placeholder="Any injuries, medical conditions, or physical limitations we should know about..."
+                disabled={isLoading}
               />
             </div>
 
@@ -285,6 +290,7 @@ export default function FitnessGoalsForm() {
                 rows={3}
                 className="w-full p-4 rounded-2xl bg-white/20 backdrop-blur-sm border border-white/30 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-cute-sky focus:border-transparent transition-all duration-300 resize-none"
                 placeholder="Vegetarian, vegan, allergies, food preferences..."
+                disabled={isLoading}
               />
             </div>
 
@@ -292,9 +298,10 @@ export default function FitnessGoalsForm() {
             <div className="mt-12 text-center">
               <button
                 type="submit"
-                className="bg-white text-cute-pink px-12 py-4 rounded-full text-xl font-bold hover:bg-opacity-90 transition-all duration-300 hover:scale-105 shadow-2xl"
+                disabled={isLoading}
+                className="bg-white text-cute-pink px-12 py-4 rounded-full text-xl font-bold hover:bg-opacity-90 transition-all duration-300 hover:scale-105 shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
-                Create My Plan 🚀
+                {isLoading ? 'Creating Your Plan...' : 'Create My Plan 🚀'}
               </button>
             </div>
           </form>
