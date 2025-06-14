@@ -77,30 +77,59 @@ export default function FitnessGoalsForm() {
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (validateForm()) {
-      setIsLoading(true);
-      
-      try {
-        // Generate fitness plans using Gemini AI
-        const fitnessPlans = await generateFitnessPlans(formData as UserData);
-        
-        // Store the plans in localStorage for the results page
-        localStorage.setItem('fitnessPlans', JSON.stringify(fitnessPlans));
-        localStorage.setItem('userData', JSON.stringify(formData));
-        
-        // Navigate to results page
-        router.push('/fitness');
-        
-      } catch (error) {
-        console.error('Error generating fitness plans:', error);
-        alert('Sorry, there was an error generating your plans. Please try again.');
-      } finally {
-        setIsLoading(false);
-      }
-    }
-  };
+  e.preventDefault();
+  if (validateForm()) {
+    setIsLoading(true);
+    
+    try {
+      const fitnessPlans = await generateFitnessPlans(formData as UserData);
 
+      // Safely parse fitness plans list from localStorage
+      let fitnessPlanList: any[] = [];
+      try {
+        const storedList = localStorage.getItem('fitnessPlanList');
+        fitnessPlanList = storedList ? JSON.parse(storedList) : [];
+        if (!Array.isArray(fitnessPlanList)) fitnessPlanList = [];
+      } catch (e) {
+        console.error('Error parsing fitnessPlanList:', e);
+        fitnessPlanList = [];
+      }
+
+      // Create a new plan object with unique ID and user data
+      const newPlan = {
+        id: Date.now().toString(), // Unique ID for each plan
+        createdAt: new Date().toISOString(),
+        userData: formData,
+        fitnessPlans: fitnessPlans,
+        title: `${formData.fitnessGoal.replace('-', ' ').toUpperCase()} Plan`,
+        description: `${formData.targetDays} days plan for ${formData.fitnessGoal.replace('-', ' ')}`
+      };
+
+      // Add new plan to the list
+      fitnessPlanList.unshift(newPlan); // Add to beginning of array
+
+      // Store everything in localStorage
+      localStorage.setItem('fitnessPlans', JSON.stringify(fitnessPlans)); // Current active plan
+      localStorage.setItem('fitnessPlanList', JSON.stringify(fitnessPlanList)); // All plans list
+      localStorage.setItem('userData', JSON.stringify(formData)); // Current user data
+      localStorage.setItem('create_new_goal', 'true');
+      localStorage.setItem('currentPlanId', newPlan.id); // Track current active plan
+
+      console.log('Data stored successfully:', {
+        currentPlan: fitnessPlans,
+        allPlans: fitnessPlanList,
+        userData: formData
+      });
+
+      router.push('/fitness');
+    } catch (error) {
+      console.error('Error generating fitness plans:', error);
+      alert('Sorry, there was an error generating your plans. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  }
+};
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-900 to-pink-900 overflow-hidden relative">
       {/* Animated Background Particles */}

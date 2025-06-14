@@ -1,135 +1,46 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
-import { Doughnut } from 'react-chartjs-2';
+import { useRouter } from 'next/navigation';
 
-ChartJS.register(ArcElement, Tooltip, Legend);
+export default function HomePage() {
+  const [fitnessPlans, setFitnessPlans] = useState<any[]>([]);
+  const [currentQuote, setCurrentQuote] = useState('');
+  const [userData, setUserData] = useState<any>(null);
+  const router = useRouter();
 
-// Type definitions
-interface Goal {
-  id: number;
-  name: string;
-  type: GoalType;
-  icon: string;
-  targetValue: number;
-  currentValue: number;
-  targetDate: string;
-  createdDate: string;
-}
+  const motivationalQuotes = [
+    "The only bad workout is the one that didn't happen. Let's make today count! 💪",
+    "Your body can do it. It's your mind you have to convince! 🧠",
+    "Success is the sum of small efforts repeated day in and day out! 🌟",
+    "Don't limit your challenges, challenge your limits! 🚀",
+    "The pain you feel today will be the strength you feel tomorrow! 💪"
+  ];
 
-type GoalType = 'weight-loss' | 'muscle-gain' | 'endurance' | 'strength' | 'flexibility';
-
-interface NewGoalForm {
-  name: string;
-  type: string;
-  targetValue: string;
-  targetDate: string;
-}
-
-interface ChartData {
-  labels: string[];
-  datasets: {
-    data: string[];
-    backgroundColor: string[];
-    borderWidth: number;
-  }[];
-}
-
-interface ChartOptions {
-  responsive: boolean;
-  maintainAspectRatio: boolean;
-  plugins: {
-    legend: {
-      position: 'bottom';
-      labels: {
-        padding: number;
-        usePointStyle: boolean;
-      };
-    };
-  };
-}
-
-// Sample initial goals data
-const initialGoals: Goal[] = [
-  {
-    id: 1,
-    name: "Lose 5kg",
-    type: "weight-loss",
-    icon: "🏃",
-    targetValue: 5,
-    currentValue: 2,
-    targetDate: "2025-08-01",
-    createdDate: "2025-06-01"
-  },
-  {
-    id: 2,
-    name: "Run 10km",
-    type: "endurance",
-    icon: "🚴",
-    targetValue: 10,
-    currentValue: 6,
-    targetDate: "2025-07-15",
-    createdDate: "2025-05-15"
-  },
-  {
-    id: 3,
-    name: "Bench Press 80kg",
-    type: "strength",
-    icon: "🏋️",
-    targetValue: 80,
-    currentValue: 65,
-    targetDate: "2025-09-01",
-    createdDate: "2025-06-01"
-  }
-];
-
-const motivationalQuotes: string[] = [
-  "The only bad workout is the one that didn't happen. Let's make today count! 💪",
-  "Your body can do it. It's your mind you have to convince! 🧠",
-  "Success is the sum of small efforts repeated day in and day out! 🌟",
-  "Don't limit your challenges, challenge your limits! 🚀",
-  "The pain you feel today will be the strength you feel tomorrow! 💪"
-];
-
-const goalIcons: Record<GoalType, string> = {
-  'weight-loss': '🏃',
-  'muscle-gain': '💪',
-  'endurance': '🚴',
-  'strength': '🏋️',
-  'flexibility': '🧘'
-};
-
-export default function FitnessDashboard(): JSX.Element {
-  const [goals, setGoals] = useState<Goal[]>(initialGoals);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [currentQuote, setCurrentQuote] = useState<string>(motivationalQuotes[0]);
-  const [newGoal, setNewGoal] = useState<NewGoalForm>({
-    name: '',
-    type: '',
-    targetValue: '',
-    targetDate: ''
-  });
-
-  // Load goals from localStorage on component mount
   useEffect(() => {
-    const savedGoals = localStorage.getItem('fitnessGoals');
-    if (savedGoals) {
+    // Load fitness plans
+    const savedPlans = localStorage.getItem('fitnessPlanList');
+    if (savedPlans) {
       try {
-        const parsedGoals: Goal[] = JSON.parse(savedGoals);
-        if (parsedGoals.length > 0) {
-          setGoals(parsedGoals);
+        const plansList = JSON.parse(savedPlans);
+        if (Array.isArray(plansList)) {
+          setFitnessPlans(plansList);
         }
-      } catch (error) {
-        console.error('Error loading goals:', error);
+      } catch (e) {
+        console.error('Error loading fitness plans:', e);
+        setFitnessPlans([]);
       }
     }
-  }, []);
 
-  // Save goals to localStorage whenever goals change
-  useEffect(() => {
-    localStorage.setItem('fitnessGoals', JSON.stringify(goals));
-  }, [goals]);
+    // Load user data
+    const formData = localStorage.getItem('userData');
+    if (formData) {
+      setUserData(JSON.parse(formData));
+    }
+
+    // Set initial quote
+    setCurrentQuote(motivationalQuotes[0]);
+  }, []);
 
   // Rotate quotes every 10 seconds
   useEffect(() => {
@@ -141,77 +52,62 @@ export default function FitnessDashboard(): JSX.Element {
     return () => clearInterval(interval);
   }, []);
 
-  const handleCreateGoal = (): void => {
-    if (!newGoal.name || !newGoal.type || !newGoal.targetValue || !newGoal.targetDate) {
-      return;
+  // Handle fitness plan card click
+  const handleFitnessPlanClick = (plan: any) => {
+    try {
+      // Set the clicked plan as the active fitness plan
+      localStorage.setItem('fitnessPlans', JSON.stringify(plan.fitnessPlans));
+      localStorage.setItem('userData', JSON.stringify(plan.userData));
+      localStorage.setItem('currentPlanId', plan.id);
+      
+      console.log('Switching to plan:', plan.title);
+      
+      // Navigate to fitness page
+      router.push('/fitness');
+    } catch (error) {
+      console.error('Error switching fitness plan:', error);
+      alert('Error loading fitness plan. Please try again.');
     }
+  };
 
-    const goal: Goal = {
-      id: Date.now(),
-      name: newGoal.name,
-      type: newGoal.type as GoalType,
-      icon: goalIcons[newGoal.type as GoalType] || '🎯',
-      targetValue: parseFloat(newGoal.targetValue),
-      currentValue: 0,
-      targetDate: newGoal.targetDate,
-      createdDate: new Date().toISOString().split('T')[0]
+  const handleCreateNewGoalClick = () => {
+    router.push('/form');
+  };
+
+  const deleteFitnessPlan = (planId: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click
+    
+    const updatedPlans = fitnessPlans.filter(plan => plan.id !== planId);
+    setFitnessPlans(updatedPlans);
+    localStorage.setItem('fitnessPlanList', JSON.stringify(updatedPlans));
+    
+    // If deleted plan was the current active plan, clear it
+    const currentPlanId = localStorage.getItem('currentPlanId');
+    if (currentPlanId === planId) {
+      localStorage.removeItem('currentPlanId');
+      localStorage.removeItem('fitnessPlans');
+      localStorage.removeItem('userData');
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  const getGoalIcon = (fitnessGoal: string) => {
+    const icons = {
+      'weight-loss': '🏃',
+      'muscle-gain': '💪',
+      'endurance': '🚴',
+      'flexibility': '🧘',
+      'general-fitness': '🏋️',
+      'strength-training': '💪'
     };
-
-    setGoals(prev => [...prev, goal]);
-    setNewGoal({ name: '', type: '', targetValue: '', targetDate: '' });
-    setIsModalOpen(false);
-  };
-
-  const updateGoalProgress = (goalId: number): void => {
-    const goal = goals.find(g => g.id === goalId);
-    if (!goal) return;
-
-    const newValue = prompt(`Update progress for "${goal.name}" (current: ${goal.currentValue}/${goal.targetValue}):`);
-    if (newValue !== null && !isNaN(Number(newValue))) {
-      setGoals(prev => prev.map(g => 
-        g.id === goalId 
-          ? { ...g, currentValue: Math.min(parseFloat(newValue), g.targetValue) }
-          : g
-      ));
-    }
-  };
-
-  // Calculate statistics
-  const totalGoals: number = goals.length;
-  const completedGoals: number = goals.filter(g => g.currentValue >= g.targetValue).length;
-  const avgProgress: number = totalGoals > 0 ? 
-    goals.reduce((sum, g) => sum + (g.currentValue / g.targetValue * 100), 0) / totalGoals : 0;
-  const streakDays: number = Math.floor(Math.random() * 30) + 1; // Simulated streak
-
-  // Chart data
-  const chartData: ChartData = {
-    labels: goals.map(goal => goal.name),
-    datasets: [{
-      data: goals.map(goal => (goal.currentValue / goal.targetValue * 100).toFixed(1)),
-      backgroundColor: [
-        '#3b82f6',
-        '#8b5cf6',
-        '#06b6d4',
-        '#10b981',
-        '#f59e0b',
-        '#ef4444'
-      ],
-      borderWidth: 0
-    }]
-  };
-
-  const chartOptions: ChartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: 'bottom',
-        labels: {
-          padding: 15,
-          usePointStyle: true
-        }
-      }
-    }
+    return icons[fitnessGoal as keyof typeof icons] || '🎯';
   };
 
   return (
@@ -224,8 +120,6 @@ export default function FitnessDashboard(): JSX.Element {
         <div className="absolute top-[30%] right-[25%] text-[120px] text-blue-500 animate-pulse" style={{ animationDelay: '1s', animationDuration: '6s' }}>🚴</div>
       </div>
 
-
-
       {/* Main Content */}
       <main className="max-w-6xl mx-auto p-8 relative z-10">
         {/* Welcome Section */}
@@ -237,169 +131,112 @@ export default function FitnessDashboard(): JSX.Element {
             {currentQuote}
           </div>
           <button
-            onClick={() => setIsModalOpen(true)}
+            onClick={handleCreateNewGoalClick}
             className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-8 py-4 rounded-2xl text-xl font-semibold hover:scale-105 hover:shadow-xl transition-all duration-300 shadow-lg shadow-blue-500/30"
           >
-            ✨ Create New Goal
+            ✨ Create New Plan
           </button>
         </section>
 
-        {/* Dashboard Grid */}
-        <div className="grid lg:grid-cols-2 gap-8 mb-12">
-          {/* Goals Section */}
-          <section className="bg-white/80 backdrop-blur-lg rounded-3xl p-8 shadow-xl border border-white/20">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-              🎯 My Goals
-            </h2>
-            <div className="space-y-4">
-              {goals.length === 0 ? (
-                <p className="text-center text-gray-500 italic">No goals yet. Create your first goal! 🎯</p>
-              ) : (
-                goals.map(goal => {
-                  const progress = Math.min((goal.currentValue / goal.targetValue) * 100, 100);
-                  return (
-                    <div
-                      key={goal.id}
-                      onClick={() => updateGoalProgress(goal.id)}
-                      className="bg-gradient-to-r from-slate-50 to-slate-100 rounded-2xl p-6 border-l-4 border-blue-500 hover:translate-x-2 hover:shadow-lg hover:shadow-blue-500/15 transition-all duration-300 cursor-pointer"
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-1 gap-4 mb-8 max-w-md mx-auto">
+          <div className="bg-white/90 rounded-2xl p-6 text-center shadow-lg hover:-translate-y-2 transition-all duration-300">
+            <div className="text-3xl font-bold text-orange-500 mb-2">{fitnessPlans.length}</div>
+            <div className="text-gray-600 font-medium">Fitness Plans</div>
+          </div>
+        </div>
+
+        {/* Fitness Plans Section */}
+        <section className="bg-white/80 backdrop-blur-lg rounded-3xl p-8 shadow-xl border border-white/20 mb-8">
+          <h2 className="text-3xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+            📋 My Fitness Plans
+          </h2>
+          
+          {fitnessPlans.length === 0 ? (
+            <div className="text-center py-16">
+              <div className="text-8xl mb-6">📋</div>
+              <h3 className="text-3xl font-bold text-gray-700 mb-4">No Fitness Plans Yet!</h3>
+              <p className="text-xl text-gray-600 mb-8">
+                Create your first fitness plan to get personalized workouts and meal plans!
+              </p>
+              <button
+                onClick={handleCreateNewGoalClick}
+                className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-8 py-4 rounded-2xl text-xl font-semibold hover:scale-105 hover:shadow-xl transition-all duration-300 shadow-lg shadow-blue-500/30"
+              >
+                🚀 Create Your First Plan
+              </button>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {fitnessPlans.map((plan) => {
+                const currentPlanId = localStorage.getItem('currentPlanId');
+                const isActivePlan = currentPlanId === plan.id;
+                
+                return (
+                  <div
+                    key={plan.id}
+                    onClick={() => handleFitnessPlanClick(plan)}
+                    className={`bg-gradient-to-r from-slate-50 to-slate-100 rounded-2xl p-6 border-l-4 ${
+                      isActivePlan ? 'border-green-500 ring-2 ring-green-200' : 'border-blue-500'
+                    } hover:translate-x-2 hover:shadow-lg hover:shadow-blue-500/15 transition-all duration-300 cursor-pointer hover:scale-105 relative`}
+                  >
+                    {/* Delete Button */}
+                    <button
+                      onClick={(e) => deleteFitnessPlan(plan.id, e)}
+                      className="absolute top-2 right-2 text-red-500 hover:text-red-700 text-xl font-bold w-8 h-8 rounded-full hover:bg-red-100 flex items-center justify-center transition-all duration-200"
+                      title="Delete Plan"
                     >
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="font-semibold text-gray-800">{goal.name}</span>
-                        <span className="text-2xl">{goal.icon}</span>
+                      ×
+                    </button>
+
+                    {/* Active Plan Badge */}
+                    {isActivePlan && (
+                      <div className="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-semibold">
+                        Active
                       </div>
-                      <div className="text-sm text-gray-600 mb-4">
-                        {goal.currentValue}/{goal.targetValue} - {progress.toFixed(1)}%
+                    )}
+                    
+                    <div className="flex items-center justify-between mb-4 mt-4">
+                      <div className="text-4xl">
+                        {getGoalIcon(plan.userData?.fitnessGoal)}
                       </div>
-                      <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-500"
-                          style={{ width: `${progress}%` }}
-                        ></div>
+                      <div className="text-right">
+                        <div className="text-lg font-bold text-blue-500">{plan.userData?.targetDays} days</div>
+                        <div className="text-gray-600 text-sm">duration</div>
                       </div>
                     </div>
-                  );
-                })
-              )}
+                    
+                    <h3 className="text-xl font-bold text-gray-800 mb-2">{plan.title}</h3>
+                    <p className="text-blue-600 font-medium mb-2">{plan.description}</p>
+                    
+                    {/* Plan Details */}
+                    <div className="space-y-2 mb-4 text-sm text-gray-600">
+                      <div className="flex justify-between">
+                        <span>Age:</span>
+                        <span>{plan.userData?.age} years</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Weight:</span>
+                        <span>{plan.userData?.weight} kg</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Level:</span>
+                        <span className="capitalize">{plan.userData?.currentFitnessLevel}</span>
+                      </div>
+                    </div>
+                    
+                    {/* Creation Date */}
+                    <div className="flex items-center justify-between text-gray-600 text-sm border-t pt-2">
+                      <span>Created: {formatDate(plan.createdAt)}</span>
+                      <span className="text-blue-500 font-medium">Click to Open →</span>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-          </section>
-
-          {/* Progress Section */}
-          <section className="bg-white/80 backdrop-blur-lg rounded-3xl p-8 shadow-xl border border-white/20">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-              📊 Progress Tracking
-            </h2>
-            <div className="h-80">
-              {goals.length > 0 ? (
-                <Doughnut data={chartData} options={chartOptions} />
-              ) : (
-                <div className="flex items-center justify-center h-full text-gray-500 italic">
-                  Create goals to see your progress chart! 📈
-                </div>
-              )}
-            </div>
-          </section>
-        </div>
-
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white/90 rounded-2xl p-6 text-center shadow-lg hover:-translate-y-2 transition-all duration-300">
-            <div className="text-3xl font-bold text-blue-500 mb-2">{totalGoals}</div>
-            <div className="text-gray-600 font-medium">Total Goals</div>
-          </div>
-          <div className="bg-white/90 rounded-2xl p-6 text-center shadow-lg hover:-translate-y-2 transition-all duration-300">
-            <div className="text-3xl font-bold text-blue-500 mb-2">{completedGoals}</div>
-            <div className="text-gray-600 font-medium">Completed</div>
-          </div>
-          <div className="bg-white/90 rounded-2xl p-6 text-center shadow-lg hover:-translate-y-2 transition-all duration-300">
-            <div className="text-3xl font-bold text-blue-500 mb-2">{avgProgress.toFixed(1)}%</div>
-            <div className="text-gray-600 font-medium">Avg Progress</div>
-          </div>
-          <div className="bg-white/90 rounded-2xl p-6 text-center shadow-lg hover:-translate-y-2 transition-all duration-300">
-            <div className="text-3xl font-bold text-blue-500 mb-2">{streakDays}</div>
-            <div className="text-gray-600 font-medium">Day Streak</div>
-          </div>
-        </div>
+          )}
+        </section>
       </main>
-
-      {/* New Goal Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl relative">
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl"
-            >
-              ×
-            </button>
-            <h3 className="text-2xl font-bold mb-6 text-gray-800">Create New Goal 🎯</h3>
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Goal Name</label>
-                <input
-                  type="text"
-                  value={newGoal.name}
-                  onChange={(e) => setNewGoal(prev => ({ ...prev, name: e.target.value }))}
-                  placeholder="e.g., Lose 10 kg"
-                  className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Goal Type</label>
-                <select
-                  value={newGoal.type}
-                  onChange={(e) => setNewGoal(prev => ({ ...prev, type: e.target.value }))}
-                  className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
-                  required
-                >
-                  <option value="">Select goal type</option>
-                  <option value="weight-loss">Weight Loss 🏃</option>
-                  <option value="muscle-gain">Muscle Gain 💪</option>
-                  <option value="endurance">Endurance 🚴</option>
-                  <option value="strength">Strength Training 🏋️</option>
-                  <option value="flexibility">Flexibility 🧘</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Target Value</label>
-                <input
-                  type="number"
-                  value={newGoal.targetValue}
-                  onChange={(e) => setNewGoal(prev => ({ ...prev, targetValue: e.target.value }))}
-                  placeholder="e.g., 10"
-                  className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Target Date</label>
-                <input
-                  type="date"
-                  value={newGoal.targetDate}
-                  onChange={(e) => setNewGoal(prev => ({ ...prev, targetDate: e.target.value }))}
-                  className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
-                  required
-                />
-              </div>
-              <div className="flex gap-4 justify-end">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-6 py-3 bg-gray-500 text-white rounded-xl font-semibold hover:bg-gray-600 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleCreateGoal}
-                  className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl font-semibold hover:scale-105 transition-all duration-300"
-                >
-                  Create Goal
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

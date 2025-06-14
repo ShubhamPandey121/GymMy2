@@ -66,9 +66,21 @@ export interface FitnessPlan {
     lifestyle: string[];
   };
 }
+//................................................................................................................................
+//definning key for remembering plans
+// Safely parse data from localStorage
+const fitnessPlanData: any[] = JSON.parse(localStorage.getItem('fitnessPlan_List') || "[]");
 
+let count: number = 0;
+
+if (fitnessPlanData.length !== 0) {
+  
+  count = fitnessPlanData[fitnessPlanData.length - 1]['Goal_No'];
+}
+//......................................................................................................................................
 export async function generateFitnessPlans(userData: UserData): Promise<FitnessPlan> {
   const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+
 
   const prompt = `
     Create a comprehensive ${userData.targetDays}-day fitness and diet plan for:
@@ -84,7 +96,7 @@ export async function generateFitnessPlans(userData: UserData): Promise<FitnessP
     - Target Duration: ${userData.targetDays} days
 
     Please provide a response in the following JSON format:
-    {
+    { "Goal_No":${count},  
       "overview": {
         "goal": "Primary fitness goal",
         "duration": "${userData.targetDays} days",
