@@ -20,16 +20,16 @@ const Header = () => {
   const isHomePage = pathname === '/';
 
   const navigationItems = isSignedIn 
-    ? [
+  ? [
+      { name: 'Home', href: '/' },
         { name: 'Dashboard', href: '/dashboard' },
-        { name: 'Workouts', href: '/workouts' },
-        { name: 'Nutrition', href: '/nutrition' },
+        { name: 'Why Us', href: '/why-us' },
+        { name: 'Fitness Meals', href: '/fitness-meal' },
         { name: 'Progress', href: '/progress' },
-        { name: 'Community', href: '/community' },
       ]
     : [
         { name: 'Features', href: '#features' },
-        { name: 'About', href: '#about' },
+        { name: 'Why Us', href: '#why-us' },
         { name: 'Contact', href: '#contact' },
       ];
 

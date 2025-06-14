@@ -30,7 +30,7 @@ export default function LandingPage(): JSX.Element {
   }, []);
 
   const handleGetStarted = (): void => {
-    router.push('/auth');
+    router.push('/dashboard');
   };
 
   const handleLearnMore = (): void => {
