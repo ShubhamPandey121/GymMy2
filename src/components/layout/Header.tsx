@@ -1,11 +1,56 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useUser, UserButton } from '@clerk/nextjs';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { CuteRobotIcon } from '@/components/icons/CharacterIcons';
 import { Menu, X } from 'lucide-react';
+import { useGlobalRewards } from '@/hook/globalReward'
+
+export const RewardsHeader = () => {
+  const { globalRewards, loadGlobalRewards } = useGlobalRewards();
+
+  useEffect(() => {
+    // Load rewards once on mount
+    loadGlobalRewards();
+    
+    // Listen for storage changes to update rewards in real-time
+    const handleStorageChange = () => {
+      loadGlobalRewards();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Also check for updates every 5 seconds if user is active
+    const interval = setInterval(loadGlobalRewards, 5000);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
+  }, []); // Empty dependency array
+
+  return (
+    <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-4 py-2 rounded-lg shadow-lg">
+      <div className="flex items-center gap-4 text-sm font-semibold">
+        <div className="flex items-center gap-1">
+          <span>🏆</span>
+          <span>{globalRewards.totalPoints} pts</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <span>📅</span>
+          <span>{globalRewards.totalCompletedDays} days</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <span>📋</span>
+          <span>{globalRewards.totalActivePlans} plans</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 
 const Header = () => {
   const { isSignedIn, user } = useUser();
@@ -22,14 +67,15 @@ const Header = () => {
   const navigationItems = isSignedIn 
   ? [
       { name: 'Home', href: '/' },
-        { name: 'Dashboard', href: '/dashboard' },
+      { name: 'Dashboard', href: '/dashboard' },
+      { name: 'Why Us', href: '/why-us' },
+      { name: 'Fitness Meals', href: '/fitness-meal' },
+      { name: 'Reward', href: '/reward' },
+    ]
+    : [
+      { name: 'Home', href: '/' },
         { name: 'Why Us', href: '/why-us' },
         { name: 'Fitness Meals', href: '/fitness-meal' },
-        { name: 'Progress', href: '/progress' },
-      ]
-    : [
-        { name: 'Features', href: '#features' },
-        { name: 'Why Us', href: '#why-us' },
         { name: 'Contact', href: '#contact' },
       ];
 
@@ -69,6 +115,9 @@ const Header = () => {
 
         {/* Desktop Auth Section */}
         <div className="hidden md:flex items-center space-x-4">
+          {isSignedIn && (
+            <RewardsHeader />
+          )}
           {isSignedIn ? (
             <div className="flex items-center space-x-4">
               <span className="text-slate-700 font-semibold">
@@ -118,6 +167,13 @@ const Header = () => {
       {isMobileMenuOpen && (
         <div className="md:hidden absolute top-full left-0 right-0 bg-white/95 backdrop-blur-lg shadow-2xl z-50 border-t border-blue-100">
           <div className="px-6 py-4 space-y-4">
+            {/* Mobile Rewards Header */}
+            {isSignedIn && (
+              <div className="pb-4 border-b border-blue-100">
+                <RewardsHeader />
+              </div>
+            )}
+
             {/* Mobile Navigation */}
             {navigationItems.map((item) => (
               <Link
