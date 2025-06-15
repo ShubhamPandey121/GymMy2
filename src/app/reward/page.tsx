@@ -216,7 +216,7 @@ const RewardsPage = (): JSX.Element => {
                   </div>
                   <span className="text-6xl ">📅</span>
                 </div>
-              </div>
+               </div>
 
               <div className="bg-gradient-to-br from-purple-400 to-pink-500 text-white p-8 rounded-3xl shadow-xl hover:scale-105 hover:-translate-y-2 transition-all duration-300 border border-white/20">
                 <div className="flex items-center justify-between">

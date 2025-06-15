@@ -35,10 +35,10 @@ export default function WhyUsPage() {
   ];
 
   const stats = [
-    { number: "50K+", label: "Happy Users", icon: "😊" },
+    { number: "10K+", label: "Happy Users", icon: "😊" },
     { number: "2M+", label: "Workouts Completed", icon: "💪" },
     { number: "98%", label: "Success Rate", icon: "🎯" },
-    { number: "24/7", label: "AI Support", icon: "🤖" }
+    { number: "24/7", label: "AI Powered", icon: "🤖" }
   ];
 
   useEffect(() => {

@@ -268,7 +268,7 @@ export default function FitnessPlanPage() {
       localStorage.setItem(`fitnessProgress_${currentPlanId}`, JSON.stringify(progressData));
     }
     updateGlobalRewards();
-    router.push('/rewards');
+    // router.push('/rewards');
   };
 
   // Rest of your component logic remains the same...

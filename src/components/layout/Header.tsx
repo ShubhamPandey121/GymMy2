@@ -39,10 +39,6 @@ export const RewardsHeader = () => {
           <span>{globalRewards.totalPoints} pts</span>
         </div>
         <div className="flex items-center gap-1">
-          <span>📅</span>
-          <span>{globalRewards.totalCompletedDays} days</span>
-        </div>
-        <div className="flex items-center gap-1">
           <span>📋</span>
           <span>{globalRewards.totalActivePlans} plans</span>
         </div>

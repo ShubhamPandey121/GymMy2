@@ -19,16 +19,17 @@ const Footer = () => {
 
   const quickLinks = isSignedIn 
     ? [
-        { name: 'Dashboard', href: '/dashboard' },
-        { name: 'My Workouts', href: '/workouts' },
-        { name: 'Nutrition Plans', href: '/nutrition' },
-        { name: 'Progress Tracker', href: '/progress' },
+      { name: 'Home', href: '/' },
+      { name: 'Dashboard', href: '/dashboard' },
+        { name: 'Why-us', href: '/why-us' },
+        { name: 'Fitness Meal', href: '/fitness-meal' },
+        { name: 'Reward', href: '/reward' },
       ]
     : [
-        { name: 'Features', href: '#features' },
-        { name: 'Pricing', href: '#pricing' },
-        { name: 'About Us', href: '#about' },
-        { name: 'Contact', href: '#contact' },
+        { name: 'Home', href: '/' },
+        { name: 'Why Us', href: '/why-us' },
+        { name: 'Fitness Meal', href: '/fitness-meal' },
+        { name: 'Contact', href: '/contact' },
       ];
 
   const supportLinks = [
@@ -39,10 +40,10 @@ const Footer = () => {
   ];
 
   const socialLinks = [
-    { name: 'GitHub', href: '#', icon: Github },
-    { name: 'Twitter', href: '#', icon: Twitter },
-    { name: 'Instagram', href: '#', icon: Instagram },
-    { name: 'Email', href: 'mailto:hello@gymmy.com', icon: Mail },
+    { name: 'GitHub', href: 'https://github.com/ShubhamPandey121', icon: Github },
+    { name: 'Twitter', href: '', icon: Twitter },
+    { name: 'Instagram', href: '', icon: Instagram },
+    { name: 'Email', href: '', icon: Mail },
   ];
 
   return (
@@ -143,7 +144,7 @@ const Footer = () => {
           <div className="text-center border-t border-slate-200 pt-8">
             <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
               <p className="text-slate-500 text-sm">
-                © 2024 GymMy - Your Cute AI Fitness Companion. All rights reserved.
+                © 2025 GymMy - Your Cute AI Fitness Companion. All rights reserved.
               </p>
               <div className="flex items-center space-x-2">
                 <span className="text-slate-500 text-sm">Made with</span>
@@ -156,11 +157,11 @@ const Footer = () => {
             {isSignedIn && (
               <div className="mt-6 bg-white/60 backdrop-blur-sm rounded-2xl p-4 max-w-2xl mx-auto border border-slate-200 shadow-sm">
                 <p className="text-slate-700 font-semibold mb-2">🎉 You're part of our amazing fitness family!</p>
-                <div className="flex justify-center space-x-8 text-sm text-slate-600">
+                {/* <div className="flex justify-center space-x-8 text-sm text-slate-600">
                   <span>💪 Workouts Completed Today</span>
                   <span>🔥 Calories Burned</span>
                   <span>⭐ Achievement Points</span>
-                </div>
+                </div> */}
               </div>
             )}
           </div>
